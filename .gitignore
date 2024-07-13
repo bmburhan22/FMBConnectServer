@@ -1,0 +1,4 @@
+.env
+dev.txt
+package-lock.json
+node_modules/
