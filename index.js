@@ -1,7 +1,7 @@
 
 import express, { json } from 'express';
 import { config } from 'dotenv'
-import { ARRAY, DATEONLY, INTEGER, Op, STRING, Sequelize, where } from 'sequelize';
+import { ARRAY, DATEONLY, INTEGER, Op, STRING, Sequelize } from 'sequelize';
 import { generate } from 'otp-generator';
 import nodemailer from 'nodemailer';
 config()
