@@ -36,7 +36,7 @@ const getDaysArray = function (start, end) {
 
 const sq = new Sequelize(process.env.DB_URL);
 const users = sq.define('users', { its: { primaryKey: true, type: INTEGER }, kitchen: {  type: INTEGER }, otp: { type: INTEGER }, phone: { type: INTEGER }, email: { type: STRING } }, { freezeTableName: true, timestamps: false });
-const skips = sq.define('skips', { date: { primaryKey: true, type: DATEONLY }, its_list: ARRAY(INTEGER) }, { freezeTableName: true, timestamps: false });
+const skips = sq.define('skips', { date: { primaryKey: true, type: DATEONLY }, kitchen: { primaryKey: true, type: INTEGER }, its_list: ARRAY(INTEGER) }, { freezeTableName: true, timestamps: false });
 const menu = sq.define('menu', { date: { primaryKey: true, type: DATEONLY },  kitchen: { primaryKey: true, type: INTEGER }, items: ARRAY(STRING) }, { freezeTableName: true, timestamps: false });
 
 
