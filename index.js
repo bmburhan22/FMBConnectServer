@@ -35,7 +35,7 @@ const getDaysArray = function (start, end) {
 };
 
 const sq = new Sequelize(process.env.DB_URL);
-const users = sq.define('users', { its: { primaryKey: true, type: INTEGER }, kitchen: { primaryKey: true, type: INTEGER }, otp: { type: INTEGER }, phone: { type: INTEGER }, email: { type: STRING } }, { freezeTableName: true, timestamps: false });
+const users = sq.define('users', { its: { primaryKey: true, type: INTEGER }, kitchen: {  type: INTEGER }, otp: { type: INTEGER }, phone: { type: INTEGER }, email: { type: STRING } }, { freezeTableName: true, timestamps: false });
 const skips = sq.define('skips', { date: { primaryKey: true, type: DATEONLY }, its_list: ARRAY(INTEGER) }, { freezeTableName: true, timestamps: false });
 const menu = sq.define('menu', { date: { primaryKey: true, type: DATEONLY },  kitchen: { primaryKey: true, type: INTEGER }, items: ARRAY(STRING) }, { freezeTableName: true, timestamps: false });
 
@@ -60,7 +60,7 @@ app.post('/send_otp', async ({ body: { its } }, res) => {
 app.get('/verify_otp', async ({ body: { its, otp } }, res) => {
     const user = await users.findOne({ where: { its } });
     if (user == null) return res.json({ its, message: 'ITS not registered', auth: false, error: 'V1' });
-    if (!user.otp) return res.json({ its, message: 'OTP not generated', auth: false, error: 'V2' });
+    if (!user.otp) return res.json({ its, message: 'Incorrect OTP', auth: false, error: 'V2' });
 
     return res.json({ auth: otp == user.otp });
 });
@@ -71,11 +71,16 @@ app.get('/verify_otp', async ({ body: { its, otp } }, res) => {
 // })
 
 app.post('/skip', async ({ body: { its, startDate, endDate } }, res) => {
+    const user = await users.findOne({where:{its}});
+    const kitchen =user?.kitchen;
+    if (kitchen==null) return res.json({message:'not created'});
+
+    
     for (var date of getDaysArray(startDate, endDate)) {
-        const [{ its_list }, isCreated] = (await skips.findOrCreate({ where: { date }, defaults: { its_list: [its] } }));
+        const [{ its_list }, isCreated] = (await skips.findOrCreate({ where: { date, kitchen }, defaults: { its_list: [its] } }));
         if (isCreated) continue;
         !its_list.includes(its) && its_list.push(its);
-        await skips.update({ its_list }, { where: { date } });
+        await skips.update({ its_list }, { where: { date, kitchen } });
     }
     return res.json({ message: 'created' });
 })
@@ -86,7 +91,6 @@ app.get('/skip', async ({ body: { its } }, res) => {
     const dates = records.map(({ date }) => date);
     return res.json({ dates });
 })
-
 
 app.get('/menu', async ({ body: {its, startDate, endDate, today } }, res) => {
     const user = await users.findOne({where:{its}});
