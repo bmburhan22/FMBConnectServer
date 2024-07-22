@@ -1,4 +1,4 @@
-name: postgres
+name: fmbconnect
 services:
   db:
     container_name: pg-container
