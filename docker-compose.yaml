@@ -1,3 +1,4 @@
+name: postgres
 services:
   db:
     container_name: pg-container
